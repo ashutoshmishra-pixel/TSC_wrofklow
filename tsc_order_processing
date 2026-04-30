@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TSC ↔ Uniware · Order Processing Workflow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --uc-primary:     #1F87C2;
+      --uc-dark:        #2C2C2C;
+      --uc-body:        #424242;
+      --uc-secondary:   #757575;
+      --uc-disabled:    #CCCCCC;
+      --uc-white:       #FFFFFF;
+      --uc-success:     #4A934A;
+      --uc-error:       #AD2820;
+      --uc-error-bg:    #FFEBEE;
+      --uc-border:      #E0E0E0;
+      --uc-row-alt:     #FAFAFA;
+      --tsc-oms:        #5C4FCF;
+      --tsc-wh:         #4A934A;
+      --uniware:        #1F87C2;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      font-variation-settings: 'wdth' 100;
+      background: #ECEFF1;
+      color: var(--uc-body);
+      font-size: 14px;
+      padding: 32px 24px;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1060px;
+      margin: 0 auto;
+      background: var(--uc-white);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    /* ======== HEADER ======== */
+    .page-header {
+      background: var(--uc-dark);
+      padding: 36px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .page-header-left h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--uc-white);
+      letter-spacing: 0.3px;
+    }
+
+    .page-header-left p {
+      color: #AAAAAA;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .uc-logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .uc-logo .uni  { color: #0CA8C8; }
+    .uc-logo .ware { color: #8DC63F; }
+
+    /* ======== LEGEND BAR ======== */
+    .legend-bar {
+      background: #F5F5F5;
+      border-bottom: 1px solid var(--uc-border);
+      padding: 13px 48px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .legend-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--uc-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .legend-actors {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .actor-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+    .actor-pill::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+    }
+    .actor-pill.oms { background: var(--tsc-oms); }
+    .actor-pill.wh  { background: var(--tsc-wh); }
+    .actor-pill.uni { background: var(--uniware); }
+
+    .legend-divider {
+      width: 1px; height: 24px;
+      background: var(--uc-border);
+    }
+
+    .legend-keys {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .legend-key {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--uc-secondary);
+    }
+
+    .lk-swatch {
+      width: 16px; height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ======== OVERVIEW ======== */
+    .overview {
+      background: #FAFAFA;
+      border-bottom: 1px solid var(--uc-border);
+      padding: 18px 48px;
+    }
+
+    .overview-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--uc-secondary);
+      margin-bottom: 12px;
+    }
+
+    .overview-flow {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+
+    .ovf-node {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      white-space: nowrap;
+      letter-spacing: 0.1px;
+    }
+    .ovf-node.n0 { background: #616161; }
+    .ovf-node.n1 { background: var(--uc-primary); }
+    .ovf-node.n2 { background: var(--uc-success); }
+    .ovf-node.n3 { background: #E65100; }
+
+    .ovf-arrow {
+      font-size: 18px;
+      color: #BDBDBD;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    .ovf-branch {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ovf-branch-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ovf-branch-line {
+      width: 2px;
+      height: 18px;
+      background: #BDBDBD;
+      margin: 0 8px;
+    }
+
+    /* ======== PHASE ======== */
+    .phase {
+      border-bottom: 3px solid var(--uc-border);
+    }
+    .phase:last-child { border-bottom: none; }
+
+    .phase-header {
+      padding: 18px 48px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .phase-header.prereq   { background: #424242; }
+    .phase-header.noncustom { background: var(--uc-primary); }
+    .phase-header.custom    { background: var(--uc-success); }
+
+    .phase-badge {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .phase-info h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .phase-info p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.72);
+      margin-top: 3px;
+    }
+
+    .phase-body {
+      padding: 28px 48px 32px;
+    }
+    .phase-body.prereq    { background: #FAFAFA; }
+    .phase-body.noncustom { background: #EFF6FF; }
+    .phase-body.custom    { background: #F0FDF4; }
+
+    /* ======== STEPS ======== */
+    .steps-container {
+      position: relative;
+    }
+
+    /* Vertical guide line */
+    .steps-container::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 20px;
+      bottom: 20px;
+      width: 2px;
+      background: var(--uc-border);
+      z-index: 0;
+    }
+
+    /* Hide guide line inside optional blocks (already has outer border) */
+    .optional-block .steps-container::before {
+      left: 19px;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .step:last-child { margin-bottom: 0; }
+
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      letter-spacing: 0.2px;
+    }
+    .step-num.actor-oms { background: var(--tsc-oms); }
+    .step-num.actor-wh  { background: var(--tsc-wh); }
+    .step-num.actor-uni { background: var(--uc-primary); }
+
+    .step-card {
+      flex: 1;
+      background: white;
+      border: 1px solid var(--uc-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .actor-tag {
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      line-height: 1.6;
+    }
+    .actor-tag.oms { background: var(--tsc-oms); }
+    .actor-tag.wh  { background: var(--tsc-wh); }
+    .actor-tag.uni { background: var(--uc-primary); }
+
+    .flow-arrow {
+      font-size: 15px;
+      color: var(--uc-secondary);
+      font-weight: 700;
+    }
+
+    .self-loop {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--uc-secondary);
+      font-style: italic;
+    }
+
+    .step-action {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--uc-body);
+      line-height: 1.45;
+    }
+
+    /* Notes */
+    .note {
+      margin-top: 8px;
+      padding: 7px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .note.info {
+      background: #FFF8E1;
+      border-left: 3px solid #FFA000;
+      color: #4E342E;
+    }
+    .note.warning {
+      background: var(--uc-error-bg);
+      border-left: 3px solid var(--uc-error);
+      color: #7B1F1F;
+    }
+    .note.system {
+      background: #E3F2FD;
+      border-left: 3px solid var(--uc-primary);
+      color: #0D47A1;
+    }
+
+    /* ======== SUB-SECTION BLOCK (Label Pasting Assistance) ======== */
+    .optional-block {
+      margin: 14px 0;
+      border: 2px solid #E0E0E0;
+      border-left: 4px solid var(--uc-error);
+      border-radius: 10px;
+      padding: 22px 18px 16px;
+      position: relative;
+      background: rgba(255,255,255,0.7);
+    }
+
+    .optional-label {
+      position: absolute;
+      top: -13px;
+      left: 14px;
+      background: var(--uc-error);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 14px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ======== FOOTER ======== */
+    .page-footer {
+      background: var(--uc-dark);
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .page-footer span {
+      font-size: 12px;
+      color: #757575;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ========== HEADER ========== -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>TSC ↔ Order Processing Workflow</h1>
+      <p>End-to-end order flow between TSC OMS, Warehouse (TSC WH), and Uniware · April 2026</p>
+    </div>
+    <div class="uc-logo"><span class="uni">uni</span><span class="ware">ware</span></div>
+  </div>
+
+  <!-- ========== LEGEND BAR ========== -->
+  <div class="legend-bar">
+    <span class="legend-section-label">Actors</span>
+    <div class="legend-actors">
+      <span class="actor-pill oms">TSC OMS</span>
+      <span class="actor-pill wh">TSC Warehouse</span>
+      <span class="actor-pill uni">Uniware</span>
+    </div>
+    <div class="legend-divider"></div>
+    <div class="legend-keys">
+      <div class="legend-key">
+        <div class="lk-swatch" style="background:#FFF8E1; border:2px solid #FFA000;"></div>
+        Context note
+      </div>
+      <div class="legend-key">
+        <div class="lk-swatch" style="background:#E3F2FD; border:2px solid #1F87C2;"></div>
+        System behaviour
+      </div>
+      <div class="legend-key">
+        <div class="lk-swatch" style="background:#FFEBEE; border:2px solid #AD2820;"></div>
+        Warning / blocker
+      </div>
+      <div class="legend-key">
+        <div class="lk-swatch" style="background:#FFEBEE; border-left:4px solid #AD2820; border-top:1px solid #E0E0E0; border-right:1px solid #E0E0E0; border-bottom:1px solid #E0E0E0;"></div>
+        Mandatory sub-step
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== OVERVIEW ========== -->
+  <div class="overview">
+    <div class="overview-label">High-level flow</div>
+    <div class="overview-flow">
+      <div class="ovf-node n0">1 · Pre-requisites</div>
+      <div class="ovf-arrow">→</div>
+      <div class="ovf-node n0">Order Split</div>
+      <div class="ovf-arrow">→</div>
+      <div class="ovf-branch">
+        <div class="ovf-branch-row">
+          <div class="ovf-node n1">2 · Non-customizable</div>
+          <div class="ovf-arrow">→</div>
+          <div class="ovf-node n3">Allocate → Pick → Pack → Manifest</div>
+        </div>
+        <div class="ovf-branch-row">
+          <div class="ovf-node n2">3 · Customizable</div>
+          <div class="ovf-arrow">→</div>
+          <div class="ovf-node n3">PO → GRN → Allocate → Pick → Pack → Manifest</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CONTENT ========== -->
+  <div class="content">
+
+    <!-- =================== PHASE 1 =================== -->
+    <div class="phase">
+      <div class="phase-header prereq">
+        <div class="phase-badge">1</div>
+        <div class="phase-info">
+          <h2>Pre-requisites</h2>
+          <p>Initial setup and order ingestion before processing begins</p>
+        </div>
+      </div>
+      <div class="phase-body prereq">
+        <div class="steps-container">
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Create SKUs in Uniware</div>
+              <div class="note info">Generic / custom SKUs will be created for all customizable items</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-oms">OMS</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag oms">TSC OMS</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Fetch orders from Shopify</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-oms">OMS</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag oms">TSC OMS</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Split order — separate customizable items from non-customizable items when both exist in one order</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-oms">OMS</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag oms">TSC OMS</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Create Sale Order in Uniware</div>
+              <div class="note info">Orders for Custom &amp; Non-standard SKUs will be created <strong>on hold</strong></div>
+              <div class="note system">One sale order can have multiple items (SOIs)</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== PHASE 2 =================== -->
+    <div class="phase">
+      <div class="phase-header noncustom">
+        <div class="phase-badge">2</div>
+        <div class="phase-info">
+          <h2>Non-Customizable Products Processing</h2>
+          <p>Standard in-stock items: allocate → pick → pack → label → manifest</p>
+        </div>
+      </div>
+      <div class="phase-body noncustom">
+        <div class="steps-container">
+
+          <div class="step">
+            <div class="step-num actor-uni">UNI</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag uni">Uniware</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Stock Allocation to created orders</div>
+              <div class="note info">Custom SKU inventory will <strong>not</strong> be allocated — these orders do not carry the generic/custom SKU</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Create Picklist with multiple shipments</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Complete Picking on Handheld (HHD)</div>
+              <div class="note info">Picker scans USNs — all items of one picklist are kept together</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Packer scans each USN in picklist via Bluetooth scanner</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-uni">UNI</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag uni">Uniware</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Invoice / Label generated for each completed shipment</div>
+              <div class="note info">Packer takes bundle of labels and goes to picklist items for pasting</div>
+            </div>
+          </div>
+
+          <!-- Optional: Label Pasting -->
+          <div class="optional-block">
+            <div class="optional-label">Label Pasting Assistance</div>
+            <div class="note warning" style="margin-bottom:14px; border-radius:6px;">
+              ⚠️ <strong>Mandatory to dispatch:</strong> Shipment cannot be dispatched without completing this step
+            </div>
+            <div class="steps-container">
+
+              <div class="step">
+                <div class="step-num actor-wh">WH</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag wh">TSC WH</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="actor-tag uni">Uniware</span>
+                  </div>
+                  <div class="step-action">Packer scans a label in HHD</div>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-num actor-uni">UNI</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag uni">Uniware</span>
+                    <span class="self-loop">↺ internal</span>
+                  </div>
+                  <div class="step-action">Display the items belonging to the shipment</div>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-num actor-wh">WH</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag wh">TSC WH</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="actor-tag uni">Uniware</span>
+                  </div>
+                  <div class="step-action">Scan the USN against the shipment</div>
+                  <div class="note info">The scanned USN will be <strong>assigned to the shipment</strong></div>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-num actor-uni">UNI</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag uni">Uniware</span>
+                    <span class="self-loop">↺ internal</span>
+                  </div>
+                  <div class="step-action">Unhold the shipment for dispatch</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Add shipments to Manifest</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Complete Manifest ✓</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== PHASE 3 =================== -->
+    <div class="phase">
+      <div class="phase-header custom">
+        <div class="phase-badge">3</div>
+        <div class="phase-info">
+          <h2>Customizable Products Processing</h2>
+          <p>Custom items: SO → PO (manufacturing) → GRN → allocate → pick → pack → manifest</p>
+        </div>
+      </div>
+      <div class="phase-body custom">
+        <div class="steps-container">
+
+          <div class="step">
+            <div class="step-num actor-uni">UNI</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag uni">Uniware</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Only the generic (custom) SKU's Sale Order is created at this stage</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-uni">UNI</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag uni">Uniware</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Convert Sale Order (SO) → Purchase Order (PO)</div>
+              <div class="note info">Multiple SOIs will have customized details — <strong>separate PO created for each SOI</strong></div>
+              <div class="note system">SO &amp; SOI codes are stored in PO custom fields</div>
+              <div class="note info">PO information will be utilised by the manufacturing unit in vendor panel</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Create USN against PO</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Print USN</div>
+              <div class="note info">USN print will include the <strong>SO code</strong></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Initiate GRN (Goods Receipt Note)</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Complete GRN &amp; Putaway</div>
+              <div class="note system">Uniware will <strong>unhold the SOIs</strong> against which GRN is complete</div>
+              <div class="note info">These items are not stored on racks — they have a dedicated storage area</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-uni">UNI</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag uni">Uniware</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Stock Allocation for generic / custom SKU</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Create Picklist with multiple shipments</div>
+              <div class="note info">All orders against which inventory was received must be selected in the picklist</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Complete Picking on Handheld</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Packer scans each USN in picklist via Bluetooth scanner</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-uni">UNI</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag uni">Uniware</span>
+                <span class="self-loop">↺ internal</span>
+              </div>
+              <div class="step-action">Invoice / Label generated for each completed shipment</div>
+              <div class="note info">Packer takes bundle of labels and goes to picklist items for pasting</div>
+            </div>
+          </div>
+
+          <!-- Optional: Label Pasting -->
+          <div class="optional-block">
+            <div class="optional-label">Label Pasting Assistance</div>
+            <div class="note warning" style="margin-bottom:14px; border-radius:6px;">
+              ⚠️ <strong>Mandatory to dispatch:</strong> Shipment cannot be dispatched without completing this step
+            </div>
+            <div class="steps-container">
+
+              <div class="step">
+                <div class="step-num actor-wh">WH</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag wh">TSC WH</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="actor-tag uni">Uniware</span>
+                  </div>
+                  <div class="step-action">Packer scans a label in HHD</div>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-num actor-uni">UNI</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag uni">Uniware</span>
+                    <span class="self-loop">↺ internal</span>
+                  </div>
+                  <div class="step-action">Display the items belonging to the shipment</div>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-num actor-wh">WH</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag wh">TSC WH</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="actor-tag uni">Uniware</span>
+                  </div>
+                  <div class="step-action">Scan the items (USN)</div>
+                  <div class="note info">Scanned USN is <strong>validated against the order</strong> — error displayed if there is a mismatch</div>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-num actor-uni">UNI</div>
+                <div class="step-card">
+                  <div class="step-header">
+                    <span class="actor-tag uni">Uniware</span>
+                    <span class="self-loop">↺ internal</span>
+                  </div>
+                  <div class="step-action">Unhold the shipment for dispatch</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Add shipments to Manifest</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num actor-wh">WH</div>
+            <div class="step-card">
+              <div class="step-header">
+                <span class="actor-tag wh">TSC WH</span>
+                <span class="flow-arrow">→</span>
+                <span class="actor-tag uni">Uniware</span>
+              </div>
+              <div class="step-action">Complete Manifest ✓</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- ========== FOOTER ========== -->
+  <div class="page-footer">
+    <span>TSC ↔ Uniware · Order Processing Workflow · April 2026</span>
+    <div class="uc-logo"><span class="uni">uni</span><span class="ware">ware</span></div>
+  </div>
+
+</div>
+</body>
+</html>
