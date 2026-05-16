@@ -409,6 +409,59 @@
       letter-spacing: 0.5px;
     }
 
+    /* ======== NEW ACTOR COLORS (Phase 3) ======== */
+    .actor-pill.factory { background: #E65100; }
+    .actor-pill.mainwh  { background: #2E7D32; }
+    .actor-pill.dummywh { background: #546E7A; }
+    .actor-pill.sap     { background: #1565C0; }
+
+    .step-num.actor-factory { background: #E65100; }
+    .step-num.actor-mainwh  { background: #2E7D32; }
+    .step-num.actor-dummywh { background: #546E7A; }
+    .step-num.actor-sap     { background: #1565C0; }
+
+    .actor-tag.factory { background: #E65100; }
+    .actor-tag.mainwh  { background: #2E7D32; }
+    .actor-tag.dummywh { background: #546E7A; }
+    .actor-tag.sap     { background: #1565C0; }
+
+    /* ======== PHASE ACTOR KEY ======== */
+    .phase-actor-key {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 8px;
+      border: 1px solid var(--uc-border);
+    }
+
+    .phase-actor-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--uc-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+    }
+
+    /* ======== SUB-PHASE ======== */
+    .sub-phase { margin-bottom: 24px; }
+    .sub-phase:last-child { margin-bottom: 0; }
+
+    .sub-phase-header {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--uc-success);
+      border-bottom: 2px solid var(--uc-success);
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+
     /* ======== FOOTER ======== */
     .page-footer {
       background: var(--uc-dark);
@@ -482,7 +535,7 @@
         <div class="ovf-branch-row">
           <div class="ovf-node n2">3 · Customizable</div>
           <div class="ovf-arrow">→</div>
-          <div class="ovf-node n3">PO → GRN → Allocate → Pick → Pack → Manifest</div>
+          <div class="ovf-node n3">Order Route → PO → Manufacture → GRN → Inbound → Facility Switch</div>
         </div>
       </div>
     </div>
@@ -720,234 +773,220 @@
       <div class="phase-header custom">
         <div class="phase-badge">3</div>
         <div class="phase-info">
-          <h2>Customizable Products Processing</h2>
-          <p>Custom items: SO → PO (manufacturing) → GRN → allocate → pick → pack → manifest</p>
+          <h2>Customizable Products — Custom PO Processing</h2>
+          <p>Order orchestration → manufacturing → inbound to Main WH → facility switch</p>
         </div>
       </div>
       <div class="phase-body custom">
-        <div class="steps-container">
 
-          <div class="step">
-            <div class="step-num actor-uni">UNI</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag uni">Uniware</span>
-                <span class="self-loop">↺ internal</span>
-              </div>
-              <div class="step-action">Only the generic (custom) SKU's Sale Order is created at this stage</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-uni">UNI</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag uni">Uniware</span>
-                <span class="self-loop">↺ internal</span>
-              </div>
-              <div class="step-action">Convert Sale Order (SO) → Purchase Order (PO)</div>
-              <div class="note info">Multiple SOIs will have customized details — <strong>separate PO created for each SOI</strong></div>
-              <div class="note system">SO &amp; SOI codes are stored in PO custom fields</div>
-              <div class="note info">PO information will be utilised by the manufacturing unit in vendor panel</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Create USN against PO</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Print USN</div>
-              <div class="note info">USN print will include the <strong>SO code</strong></div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="self-loop">↺ internal</span>
-              </div>
-              <div class="step-action">Initiate GRN (Goods Receipt Note)</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="self-loop">↺ internal</span>
-              </div>
-              <div class="step-action">Complete GRN &amp; Putaway</div>
-              <div class="note system">Uniware will <strong>unhold the SOIs</strong> against which GRN is complete</div>
-              <div class="note info">These items are not stored on racks — they have a dedicated storage area</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-uni">UNI</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag uni">Uniware</span>
-                <span class="self-loop">↺ internal</span>
-              </div>
-              <div class="step-action">Stock Allocation for generic / custom SKU</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Create Picklist with multiple shipments</div>
-              <div class="note info">All orders against which inventory was received must be selected in the picklist</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Complete Picking on Handheld</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Packer scans each USN in picklist via Bluetooth scanner</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-uni">UNI</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag uni">Uniware</span>
-                <span class="self-loop">↺ internal</span>
-              </div>
-              <div class="step-action">Invoice / Label generated for each completed shipment</div>
-              <div class="note info">Packer takes bundle of labels and goes to picklist items for pasting</div>
-            </div>
-          </div>
-
-          <!-- Optional: Label Pasting -->
-          <div class="optional-block">
-            <div class="optional-label">Label Pasting Assistance</div>
-            <div class="note warning" style="margin-bottom:14px; border-radius:6px;">
-              ⚠️ <strong>Mandatory to dispatch:</strong> Shipment cannot be dispatched without completing this step
-            </div>
-            <div class="steps-container">
-
-              <div class="step">
-                <div class="step-num actor-wh">WH</div>
-                <div class="step-card">
-                  <div class="step-header">
-                    <span class="actor-tag wh">TSC WH</span>
-                    <span class="flow-arrow">→</span>
-                    <span class="actor-tag uni">Uniware</span>
-                  </div>
-                  <div class="step-action">Packer scans a label in HHD</div>
-                </div>
-              </div>
-
-              <div class="step">
-                <div class="step-num actor-uni">UNI</div>
-                <div class="step-card">
-                  <div class="step-header">
-                    <span class="actor-tag uni">Uniware</span>
-                    <span class="self-loop">↺ internal</span>
-                  </div>
-                  <div class="step-action">Display the items belonging to the shipment</div>
-                </div>
-              </div>
-
-              <div class="step">
-                <div class="step-num actor-wh">WH</div>
-                <div class="step-card">
-                  <div class="step-header">
-                    <span class="actor-tag wh">TSC WH</span>
-                    <span class="flow-arrow">→</span>
-                    <span class="actor-tag uni">Uniware</span>
-                  </div>
-                  <div class="step-action">Scan the items (USN)</div>
-                  <div class="note info">Scanned USN is <strong>validated against the order</strong> — error displayed if there is a mismatch</div>
-                </div>
-              </div>
-
-              <div class="step">
-                <div class="step-num actor-uni">UNI</div>
-                <div class="step-card">
-                  <div class="step-header">
-                    <span class="actor-tag uni">Uniware</span>
-                    <span class="self-loop">↺ internal</span>
-                  </div>
-                  <div class="step-action">Unhold the shipment for dispatch</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Add shipments to Manifest</div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num actor-wh">WH</div>
-            <div class="step-card">
-              <div class="step-header">
-                <span class="actor-tag wh">TSC WH</span>
-                <span class="flow-arrow">→</span>
-                <span class="actor-tag uni">Uniware</span>
-              </div>
-              <div class="step-action">Complete Manifest ✓</div>
-            </div>
-          </div>
-
+        <!-- Phase 3 Actor Key -->
+        <div class="phase-actor-key">
+          <span class="phase-actor-label">Actors in this phase:</span>
+          <span class="actor-pill uni">Uniware</span>
+          <span class="actor-pill factory">Factory</span>
+          <span class="actor-pill mainwh">Main WH</span>
+          <span class="actor-pill dummywh">Dummy WH</span>
+          <span class="actor-pill sap">SAP</span>
         </div>
+
+        <!-- Sub-phase A: Order Orchestration -->
+        <div class="sub-phase">
+          <div class="sub-phase-header">Order Orchestration</div>
+          <div class="steps-container">
+
+            <div class="step">
+              <div class="step-num actor-uni">UNI</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag uni">Uniware</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Order Create</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-uni">UNI</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag uni">Uniware</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag mainwh">Main WH</span>
+                </div>
+                <div class="step-action">Route Order to Main WH</div>
+                <div class="note info">Existing facility allocation rules will work here</div>
+                <div class="note system">SAP to have 2 facility codes mapped for a single WH</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Sub-phase B: Manufacturing of Items -->
+        <div class="sub-phase">
+          <div class="sub-phase-header">Manufacturing of Items</div>
+          <div class="steps-container">
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag dummywh">Dummy WH</span>
+                </div>
+                <div class="step-action">Order switched automatically to Dummy WH</div>
+                <div class="note info">The Dummy WH &amp; Main WH will have a one-to-one mapping</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-uni">UNI</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag uni">Uniware</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag mainwh">Main WH</span>
+                </div>
+                <div class="step-action">Create PO against the SO</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-uni">UNI</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag uni">Uniware</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag factory">Factory</span>
+                </div>
+                <div class="step-action">View PO via Vendor Panel</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-factory">FAC</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag factory">Factory</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Manufacture Item</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-factory">FAC</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag factory">Factory</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Print USN &amp; Print PO Code</div>
+                <div class="note info">Two different barcodes printed &amp; pasted over each item</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-factory">FAC</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag factory">Factory</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag sap">SAP</span>
+                </div>
+                <div class="step-action">Update Manufacturing Information in SAP</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-sap">SAP</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag sap">SAP</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Create GRN in Uniware</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Sub-phase C: Inbound in Main WH -->
+        <div class="sub-phase">
+          <div class="sub-phase-header">Inbound in Main WH</div>
+          <div class="steps-container">
+
+            <div class="step">
+              <div class="step-num actor-factory">FAC</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag factory">Factory</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag mainwh">Main WH</span>
+                </div>
+                <div class="step-action">Transfer Items to Main WH</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Search GRN Code against Item</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Create Putaway</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Complete Putaway</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-dummywh">DWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag dummywh">Dummy WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag mainwh">Main WH</span>
+                </div>
+                <div class="step-action">Switch Facility back to Main WH ✓</div>
+                <div class="note system">Uniware does this automatically once putaway is complete for the item</div>
+                <div class="note warning">Order will <strong>not switch</strong> until all items are received in Main WH</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
 
   </div><!-- /content -->
+
 
   <!-- ========== FOOTER ========== -->
   <div class="page-footer">
