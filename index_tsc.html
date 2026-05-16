@@ -982,6 +982,157 @@
           </div>
         </div>
 
+
+        <!-- Sub-phase D: Pick, Pack & Dispatch -->
+        <div class="sub-phase">
+          <div class="sub-phase-header">Pick, Pack &amp; Dispatch</div>
+          <div class="steps-container">
+
+            <div class="step">
+              <div class="step-num actor-uni">UNI</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag uni">Uniware</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Stock Allocation for custom SKU</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Create Picklist with multiple shipments</div>
+                <div class="note info">All orders against which inventory was received must be selected in the picklist</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Complete Picking on Handheld (HHD)</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Packer scans each USN in picklist via Bluetooth scanner</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-uni">UNI</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag uni">Uniware</span>
+                  <span class="self-loop">↺ internal</span>
+                </div>
+                <div class="step-action">Invoice / Label generated for each completed shipment</div>
+                <div class="note info">Packer takes bundle of labels and goes to picklist items for pasting</div>
+              </div>
+            </div>
+
+            <!-- Label Pasting Assistance -->
+            <div class="optional-block">
+              <div class="optional-label">Label Pasting Assistance</div>
+              <div class="note warning" style="margin-bottom:14px; border-radius:6px;">
+                ⚠️ <strong>Mandatory to dispatch:</strong> Shipment cannot be dispatched without completing this step
+              </div>
+              <div class="steps-container">
+
+                <div class="step">
+                  <div class="step-num actor-mainwh">MWH</div>
+                  <div class="step-card">
+                    <div class="step-header">
+                      <span class="actor-tag mainwh">Main WH</span>
+                      <span class="flow-arrow">→</span>
+                      <span class="actor-tag uni">Uniware</span>
+                    </div>
+                    <div class="step-action">Packer scans a label in HHD</div>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-num actor-uni">UNI</div>
+                  <div class="step-card">
+                    <div class="step-header">
+                      <span class="actor-tag uni">Uniware</span>
+                      <span class="self-loop">↺ internal</span>
+                    </div>
+                    <div class="step-action">Display the items belonging to the shipment</div>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-num actor-mainwh">MWH</div>
+                  <div class="step-card">
+                    <div class="step-header">
+                      <span class="actor-tag mainwh">Main WH</span>
+                      <span class="flow-arrow">→</span>
+                      <span class="actor-tag uni">Uniware</span>
+                    </div>
+                    <div class="step-action">Scan the items (USN)</div>
+                    <div class="note info">Scanned USN is <strong>validated against the order</strong> — error displayed if there is a mismatch</div>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-num actor-uni">UNI</div>
+                  <div class="step-card">
+                    <div class="step-header">
+                      <span class="actor-tag uni">Uniware</span>
+                      <span class="self-loop">↺ internal</span>
+                    </div>
+                    <div class="step-action">Unhold the shipment for dispatch</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Add shipments to Manifest</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num actor-mainwh">MWH</div>
+              <div class="step-card">
+                <div class="step-header">
+                  <span class="actor-tag mainwh">Main WH</span>
+                  <span class="flow-arrow">→</span>
+                  <span class="actor-tag uni">Uniware</span>
+                </div>
+                <div class="step-action">Complete Manifest ✓</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
 
